@@ -891,21 +891,24 @@
     async function fetchStatus() {
       var apiKey = document.getElementById('apiKey').value.trim();
       var tbody = document.getElementById('statusBody');
-      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Chargement...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Chargement...</td></tr>';
 
       try {
         var res = await fetch(SERVER_URL + '/status', {
           headers: { 'x-api-key': apiKey },
         });
+        
+        var data = await res.json();
+        
         if (!res.ok) {
-          var data = await res.json();
-          tbody.innerHTML = '<tr><td colspan="6" class="empty-state" style="color:var(--red)">'
+          tbody.innerHTML = '<tr><td colspan="8" class="empty-state" style="color:var(--red)">'
             + (data.message || 'Non autorisé') + '</td></tr>';
           return;
         }
-        var rows = await res.json();
+
+        var rows = data;
         if (!rows.length) {
-          tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Aucune licence enregistrée.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Aucune licence enregistrée.</td></tr>';
           return;
         }
         function fmt(d) {
