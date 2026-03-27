@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RestauOS — Générateur de Licences</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ── Zen Color Palette (matches RestauOS src/index.css) ── */
+    :root {
+      --zen-bg: #f5f5f0;
+      --zen-surface: #ffffff;
+      --zen-border: #e5e5e5;
+      --zen-text-primary: #5a5a40;
+      --zen-text-muted: #8e9299;
+      --zen-accent: #5a5a40;
+      --zen-accent-light: rgba(90, 90, 64, 0.08);
+      --zen-accent-glow: rgba(90, 90, 64, 0.15);
+      --green: #10b981;
+      --amber: #b45309;
+      --purple: #6d28d9;
+      --red: #dc2626;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--zen-bg);
+      color: var(--zen-text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 20px 80px;
+    }
+
+    /* ── Header ── */
+    header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--zen-accent);
+      background: var(--zen-accent-light);
+      border: 1px solid rgba(90, 90, 64, 0.2);
+      padding: 4px 16px;
+      border-radius: 999px;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: clamp(26px, 4vw, 44px);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+      color: var(--zen-text-primary);
+    }
+
+    h1 span {
+      border-bottom: 3px solid var(--zen-accent);
+      padding-bottom: 2px;
+    }
+
+    .subtitle {
+      color: var(--zen-text-muted);
+      font-size: 14px;
+      margin-top: 10px;
+      font-style: italic;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--zen-surface);
+      border: 1px solid var(--zen-border);
+      border-radius: 32px;
+      padding: 32px;
+      width: 100%;
+      max-width: 820px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    }
+
+    .card+.card {
+      margin-top: 20px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .card-title {
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--zen-text-muted);
+    }
+
+    .server-pill {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      color: var(--green);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: 0.35
+      }
+    }
+
+    /* ── Controls ── */
+    .controls {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+      min-width: 140px;
+    }
+
+    label {
+      font-size: 9px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.25em;
+      color: var(--zen-text-muted);
+    }
+
+    .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrap input,
+    input[type="number"],
+    input[type="text"] {
+      background: var(--zen-bg);
+      border: 1px solid var(--zen-border);
+      border-radius: 14px;
+      padding: 12px 48px 12px 16px;
+      color: var(--zen-text-primary);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      width: 100%;
+    }
+
+    input[type="number"] {
+      padding: 12px 16px;
+    }
+
+    .input-wrap input:focus,
+    input[type="number"]:focus {
+      border-color: var(--zen-accent);
+      box-shadow: 0 0 0 3px var(--zen-accent-glow);
+    }
+
+    .eye-btn {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--zen-text-muted);
+      font-size: 16px;
+      padding: 4px;
+      border-radius: 6px;
+      transition: color 0.15s;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .eye-btn:hover {
+      color: var(--zen-accent);
+    }
+
+    /* ── Duration Selector ── */
+    .dur-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .dur-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      padding: 14px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      border: 1.5px solid var(--zen-border);
+      background: var(--zen-bg);
+      transition: all 0.2s;
+      flex: 1;
+      min-width: 110px;
+    }
+
+    .dur-btn:hover {
+      border-color: var(--zen-accent);
+      background: var(--zen-accent-light);
+    }
+
+    .dur-btn .dur-icon {
+      font-size: 22px;
+    }
+
+    .dur-btn .dur-label {
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--zen-text-muted);
+    }
+
+    .dur-btn .dur-sub {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--zen-text-muted);
+      opacity: 0.7;
+      margin-top: 1px;
+    }
+
+    .dur-btn.sel-30 {
+      border-color: var(--amber);
+      background: rgba(180, 83, 9, 0.06);
+    }
+
+    .dur-btn.sel-30 .dur-label,
+    .dur-btn.sel-30 .dur-sub {
+      color: var(--amber);
+      opacity: 1;
+    }
+
+    .dur-btn.sel-365 {
+      border-color: var(--green);
+      background: rgba(16, 185, 129, 0.06);
+    }
+
+    .dur-btn.sel-365 .dur-label,
+    .dur-btn.sel-365 .dur-sub {
+      color: var(--green);
+      opacity: 1;
+    }
+
+    .dur-btn.sel-life {
+      border-color: var(--purple);
+      background: rgba(109, 40, 217, 0.05);
+    }
+
+    .dur-btn.sel-life .dur-label,
+    .dur-btn.sel-life .dur-sub {
+      color: var(--purple);
+      opacity: 1;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 22px;
+      border-radius: 14px;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--zen-accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--zen-text-muted);
+      border: 1px solid var(--zen-border);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--zen-accent);
+      color: var(--zen-accent);
+    }
+
+    .btn-green {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--green);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
+    .btn-green:hover {
+      background: rgba(16, 185, 129, 0.18);
+    }
+
+    .btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* ── Key List ── */
+    .key-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .key-item {
+      display: flex;
+      align-items: center;
+      background: var(--zen-bg);
+      border: 1px solid var(--zen-border);
+      border-radius: 14px;
+      padding: 12px 16px;
+      gap: 12px;
+      transition: border-color 0.2s;
+    }
+
+    .key-item:hover {
+      border-color: var(--zen-accent);
+    }
+
+    .key-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--zen-text-primary);
+      letter-spacing: 0.04em;
+      flex: 1;
+    }
+
+    .dur-tag {
+      font-size: 8px;
+      font-weight: 900;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+
+    .dur-tag.t30 {
+      background: rgba(180, 83, 9, 0.1);
+      color: var(--amber);
+    }
+
+    .dur-tag.t365 {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--green);
+    }
+
+    .dur-tag.tlife {
+      background: rgba(109, 40, 217, 0.08);
+      color: var(--purple);
+    }
+
+    .copy-btn {
+      background: none;
+      border: none;
+      color: var(--zen-text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      transition: all 0.15s;
+    }
+
+    .copy-btn:hover {
+      background: var(--zen-border);
+      color: var(--zen-accent);
+    }
+
+    .btn-icon {
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-icon.delete {
+      color: var(--zen-text-muted);
+    }
+
+    .btn-icon.delete:hover {
+      background: rgba(220, 38, 38, 0.1);
+      color: var(--red);
+    }
+
+    .btn-icon.unlink {
+      color: var(--zen-text-muted);
+    }
+
+    .btn-icon.unlink:hover {
+      background: rgba(109, 40, 217, 0.1);
+      color: var(--purple);
+    }
+
+    .actions-cell {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    svg {
+      pointer-events: none;
+    }
+
+    /* ── Table ── */
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      text-align: left;
+      font-size: 9px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--zen-text-muted);
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--zen-border);
+    }
+
+    td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--zen-bg);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--zen-text-primary);
+      vertical-align: middle;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: var(--zen-bg);
+    }
+
+    .status-pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 9px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .status-pill.active {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--green);
+    }
+
+    .status-pill.inactive {
+      background: rgba(142, 146, 153, 0.1);
+      color: var(--zen-text-muted);
+    }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 999;
+      padding: 14px 22px;
+      border-radius: 16px;
+      font-weight: 700;
+      font-size: 13px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-8px);
+      transition: all 0.3s ease;
+      max-width: 360px;
+    }
+
+    #toast.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    #toast.ok {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--green);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    #toast.err {
+      background: rgba(220, 38, 38, 0.10);
+      border: 1px solid rgba(220, 38, 38, 0.25);
+      color: var(--red);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--zen-text-muted);
+      padding: 36px;
+      font-size: 13px;
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--zen-bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--zen-border);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--zen-accent);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="toast"></div>
+
+  <header>
+    <div class="badge">🔐 Outil Développeur — RestauOS</div>
+    <h1>Générateur de <span>Licences</span></h1>
+    <p class="subtitle">Créez, enregistrez et gérez les clés de licence RestauOS</p>
+  </header>
+
+  <!-- CONFIG -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:8px;margin-top:-2px"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+        Configuration
+      </span>
+      <span class="server-pill"><span class="dot"></span>license-server-ldch.onrender.com</span>
+    </div>
+    <div class="controls">
+      <div class="field">
+        <label>Clé API Secrète</label>
+        <div class="input-wrap">
+          <input type="password" id="apiKey" value="restauos-dev-secret" placeholder="restauos-dev-secret"
+            title="Clé API Secrète" aria-label="Clé API Secrète" />
+          <button class="eye-btn" id="eyeBtn" onclick="toggleApiKey()" title="Afficher / Masquer la clé">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="eye-on"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="eye-off" style="display:none"><path d="M9.88 9.88L14.47 14.47M16.47 16.47L19.29 19.31"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/><path d="M8.54 8.54a4 4 0 1 0 5.92 5.92"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="field" style="max-width:110px">
+        <label>Quantité</label>
+        <input type="number" id="qty" value="1" min="1" max="100" title="Nombre de clés"
+          aria-label="Nombre de clés à générer" />
+      </div>
+    </div>
+  </div>
+
+  <!-- GENERATION -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:8px;margin-top:-2px"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3L15.5 7.5z"/></svg>
+        Génération
+      </span>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-outline" onclick="clearKeys()">Effacer</button>
+        <button class="btn btn-primary" onclick="generateKeys()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+          Générer
+        </button>
+      </div>
+    </div>
+
+    <label style="display:block;margin-bottom:12px">Durée de la Licence</label>
+    <div class="dur-group">
+      <button class="dur-btn" id="dur-30" onclick="selectDuration('30')">
+        <span class="dur-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </span>
+        <span class="dur-label">30 Jours</span>
+        <span class="dur-sub">Essai / Démo</span>
+      </button>
+      <button class="dur-btn" id="dur-365" onclick="selectDuration('365')">
+        <span class="dur-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+        </span>
+        <span class="dur-label">365 Jours</span>
+        <span class="dur-sub">1 An — Standard</span>
+      </button>
+      <button class="dur-btn" id="dur-life" onclick="selectDuration('life')">
+        <span class="dur-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12c-2-2.67-4-4-6-4a4 4 0 1 0 0 8c2 0 4-1.33 6-4Zm0 0c2 2.67 4 4 6 4a4 4 0 0 0 0-8c-2 0-4 1.33-6 4Z"/></svg>
+        </span>
+        <span class="dur-label">À Vie</span>
+        <span class="dur-sub">Licence Permanente</span>
+      </button>
+    </div>
+
+    <div id="keyList" class="key-list" style="margin-top:20px">
+      <div class="empty-state">Sélectionnez une durée puis cliquez sur « Générer ».</div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;flex-wrap:wrap">
+      <button class="btn btn-outline" onclick="copyAll()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+        Tout copier
+      </button>
+      <button class="btn btn-green" id="sendBtn" onclick="sendToServer()" disabled>
+        ⬆ Envoyer au Serveur Render
+      </button>
+    </div>
+  </div>
+
+  <!-- STATUS -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:8px;margin-top:-2px"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+        Licences enregistrées
+      </span>
+      <button class="btn btn-outline" onclick="fetchStatus()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
+        Actualiser
+      </button>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Clé de Licence</th>
+            <th>Durée</th>
+            <th>Jours Restants</th>
+            <th>Machine ID</th>
+            <th>Activée le</th>
+            <th>Créée le</th>
+            <th>Statut</th>
+            <th style="text-align:right">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="statusBody">
+          <tr>
+            <td colspan="6" class="empty-state">Cliquez sur « Actualiser » pour charger les données.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const SERVER_URL = 'https://license-server-ldch.onrender.com';
+
+    // ── State (all vars first, before any function calls) ────────────────────
+    var generatedKeys = [];
+    var selectedDuration = '365';
+
+    // Key & class maps — use var to avoid TDZ issues
+    var PREFIX = { '30': 'R30D', '365': 'R365', 'life': 'RLIF' };
+    var DUR_CLASSES = { '30': 'sel-30', '365': 'sel-365', 'life': 'sel-life' };
+    var DUR_IDS = { '30': 'dur-30', '365': 'dur-365', 'life': 'dur-life' };
+
+    // ── Toast ────────────────────────────────────────────────────────────────
+    var toastTimer = null;
+    function showToast(msg, ok) {
+      ok = ok !== false;
+      var el = document.getElementById('toast');
+      el.textContent = msg;
+      el.className = 'show ' + (ok ? 'ok' : 'err');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () { el.className = ''; }, 4000);
+    }
+
+    // ── Show / Hide API Key ──────────────────────────────────────────────────
+    function toggleApiKey() {
+      var input = document.getElementById('apiKey');
+      var btn = document.getElementById('eyeBtn');
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.querySelector('.eye-on').style.display = 'none';
+        btn.querySelector('.eye-off').style.display = 'block';
+        btn.title = 'Masquer';
+      } else {
+        input.type = 'password';
+        btn.querySelector('.eye-on').style.display = 'block';
+        btn.querySelector('.eye-off').style.display = 'none';
+        btn.title = 'Afficher';
+      }
+    }
+
+    // ── Duration Selector ────────────────────────────────────────────────────
+    function selectDuration(dur) {
+      selectedDuration = dur;
+      Object.keys(DUR_IDS).forEach(function (d) {
+        var el = document.getElementById(DUR_IDS[d]);
+        if (el) el.className = 'dur-btn';
+      });
+      var active = document.getElementById(DUR_IDS[dur]);
+      if (active) active.classList.add(DUR_CLASSES[dur]);
+    }
+
+    // ── Key Generator ─────────────────────────────────────────────────────────
+    function generateSegment(len) {
+      len = len || 4;
+      var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      var arr = new Uint8Array(len);
+      crypto.getRandomValues(arr);
+      return Array.from(arr, function (b) { return chars[b % chars.length]; }).join('');
+    }
+
+    function generateKey() {
+      var p = PREFIX[selectedDuration] || 'R365';
+      return p + '-' + generateSegment() + '-' + generateSegment() + '-' + generateSegment() + '-' + generateSegment();
+    }
+
+    function generateKeys() {
+      var qty = Math.min(100, Math.max(1, parseInt(document.getElementById('qty').value) || 1));
+      generatedKeys = [];
+      for (var i = 0; i < qty; i++) generatedKeys.push(generateKey());
+      renderKeyList();
+      document.getElementById('sendBtn').disabled = false;
+      var label = selectedDuration === 'life' ? 'À Vie' : selectedDuration + ' jours';
+      showToast('✦ ' + qty + ' clé' + (qty > 1 ? 's' : '') + ' (' + label + ') générée' + (qty > 1 ? 's' : '') + '.');
+    }
+
+    function getDurTag(key) {
+      if (key.indexOf('R30D') === 0) return '<span class="dur-tag t30">30 Jours</span>';
+      if (key.indexOf('RLIF') === 0) return '<span class="dur-tag tlife">À Vie</span>';
+      return '<span class="dur-tag t365">365 Jours</span>';
+    }
+
+    function renderKeyList() {
+      var list = document.getElementById('keyList');
+      if (!generatedKeys.length) {
+        list.innerHTML = '<div class="empty-state">Aucune clé générée.</div>';
+        return;
+      }
+      list.innerHTML = generatedKeys.map(function (k) {
+        return '<div class="key-item">'
+          + getDurTag(k)
+          + '<span class="key-text">' + k + '</span>'
+          + '<button class="copy-btn" onclick="copyKey(\'' + k + '\', this)" title="Copier">'
+          + '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>'
+          + '</button>'
+          + '</div>';
+      }).join('');
+    }
+
+    function copyKey(key, btn) {
+      navigator.clipboard.writeText(key);
+      var oldHtml = btn.innerHTML;
+      btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+      setTimeout(function () { btn.innerHTML = oldHtml; }, 1500);
+    }
+
+    function copyAll() {
+      if (!generatedKeys.length) { showToast('Aucune clé à copier.', false); return; }
+      navigator.clipboard.writeText(generatedKeys.join('\n'));
+      showToast('📋 ' + generatedKeys.length + ' clé(s) copiée(s) !');
+    }
+
+    function clearKeys() {
+      generatedKeys = [];
+      renderKeyList();
+      document.getElementById('sendBtn').disabled = true;
+    }
+
+    // ── Send to Server ────────────────────────────────────────────────────────
+    async function sendToServer() {
+      if (!generatedKeys.length) { showToast('Aucune clé à envoyer.', false); return; }
+      var apiKey = document.getElementById('apiKey').value.trim();
+      if (!apiKey) { showToast('Clé API secrète manquante.', false); return; }
+
+      var btn = document.getElementById('sendBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Envoi en cours...';
+
+      try {
+        var res = await fetch(SERVER_URL + '/add-keys', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+          body: JSON.stringify({ keys: generatedKeys }),
+        });
+        var data = await res.json();
+        if (res.ok && data.success) {
+          showToast('✅ ' + data.message);
+          generatedKeys = [];
+          renderKeyList();
+          await fetchStatus();
+        } else {
+          showToast('❌ ' + (data.message || 'Erreur serveur.'), false);
+        }
+      } catch (err) {
+        showToast('❌ Impossible de joindre le serveur Render.', false);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '⬆ Envoyer au Serveur Render';
+      }
+    }
+
+    // ── Fetch Status ──────────────────────────────────────────────────────────
+    function getDurLabel(key) {
+      if (!key) return '—';
+      if (key.indexOf('R30D') === 0) return '<span class="dur-tag t30">30 J</span>';
+      if (key.indexOf('RLIF') === 0) return '<span class="dur-tag tlife">À Vie</span>';
+      return '<span class="dur-tag t365">365 J</span>';
+    }
+
+    async function fetchStatus() {
+      var apiKey = document.getElementById('apiKey').value.trim();
+      var tbody = document.getElementById('statusBody');
+      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Chargement...</td></tr>';
+
+      try {
+        var res = await fetch(SERVER_URL + '/status', {
+          headers: { 'x-api-key': apiKey },
+        });
+        if (!res.ok) {
+          var data = await res.json();
+          tbody.innerHTML = '<tr><td colspan="6" class="empty-state" style="color:var(--red)">'
+            + (data.message || 'Non autorisé') + '</td></tr>';
+          return;
+        }
+        var rows = await res.json();
+        if (!rows.length) {
+          tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Aucune licence enregistrée.</td></tr>';
+          return;
+        }
+        function fmt(d) {
+          return d ? new Date(d).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }) : '—';
+        }
+        function getRemainingDays(r) {
+          if (r.days_remaining !== null && r.days_remaining !== undefined) return r.days_remaining;
+          if (!r.activated_at) {
+            if (r.key.indexOf('R30D') === 0) return 30;
+            if (r.key.indexOf('RLIF') === 0) return '∞';
+            return 365;
+          }
+          var ttlMs = 365 * 24 * 3600 * 1000;
+          if (r.key.indexOf('R30D') === 0) ttlMs = 30 * 24 * 3600 * 1000;
+          else if (r.key.indexOf('RLIF') === 0) return '∞';
+
+          var actMs = new Date(r.activated_at).getTime();
+          var elapsed = Date.now() - actMs;
+          var rem = Math.max(0, Math.ceil((ttlMs - elapsed) / (24 * 3600 * 1000)));
+          return rem;
+        }
+
+        tbody.innerHTML = rows.map(function (r) {
+          var mid = r.machine_id ? r.machine_id : '—';
+          var days = getRemainingDays(r);
+          var key = r.key;
+          
+          return '<tr>'
+            + '<td>' + key + '</td>'
+            + '<td>' + getDurLabel(key) + '</td>'
+            + '<td><strong>' + days + '</strong></td>'
+            + '<td title="' + mid + '">' + (r.machine_id ? mid.slice(0, 8) + '…' : '—') + '</td>'
+            + '<td>' + fmt(r.activated_at) + '</td>'
+            + '<td>' + fmt(r.created_at) + '</td>'
+            + '<td><span class="status-pill ' + (r.machine_id ? 'active' : 'inactive') + '">'
+            + (r.machine_id ? 'Activée' : 'Disponible') + '</span></td>'
+            + '<td><div class="actions-cell" style="justify-content:flex-end">'
+            + '<button class="btn-icon" onclick="copyKey(\'' + key + '\', this)" title="Copier"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg></button>'
+            + (r.machine_id ? '<button class="btn-icon unlink" onclick="dissociateKey(\'' + key + '\')" title="Désassocier"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m11 11-4 4"/><path d="m13 13 4-4"/><path d="m15.5 13 2.5 2.5a3.5 3.5 0 0 1-5 5l-2.5-2.5"/><path d="m8.5 11-2.5-2.5a3.5 3.5 0 0 1 5-5l2.5 2.5"/></svg></button>' : '')
+            + '<button class="btn-icon delete" onclick="deleteKey(\'' + key + '\')" title="Supprimer"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>'
+            + '</div></td>'
+            + '</tr>';
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="8" class="empty-state" style="color:var(--red)">Erreur réseau — serveur injoignable.</td></tr>';
+      }
+    }
+
+    async function deleteKey(key) {
+      if (!confirm('🛑 ATTENTION : Supprimer définitivement la clé ' + key + ' ?\n\nCette action est irréversible. La machine liée perdra immédiatement son accès.')) return;
+      var apiKey = document.getElementById('apiKey').value.trim();
+      try {
+        var res = await fetch(SERVER_URL + '/delete-key', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+          body: JSON.stringify({ key: key, admin: 'Developer_Console' }),
+        });
+        var data = await res.json();
+        if (data.success) {
+          showToast('✅ ' + data.message);
+          fetchStatus();
+        } else {
+          showToast('❌ ' + data.message, false);
+        }
+      } catch (err) {
+        showToast('❌ Erreur réseau.', false);
+      }
+    }
+
+    async function dissociateKey(key) {
+      if (!confirm('🔄 DÉSASSOCIER la clé ' + key + ' ?\n\nLa machine actuelle perdra son accès, mais la clé redeviendra disponible pour une nouvelle installation.')) return;
+      var apiKey = document.getElementById('apiKey').value.trim();
+      try {
+        var res = await fetch(SERVER_URL + '/release', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+          body: JSON.stringify({ key: key, secret: apiKey, admin: 'Developer_Console' }),
+        });
+        var data = await res.json();
+        if (data.success) {
+          showToast('✅ ' + data.message);
+          fetchStatus();
+        } else {
+          showToast('❌ ' + data.message, false);
+        }
+      } catch (err) {
+        showToast('❌ Erreur réseau.', false);
+      }
+    }
+
+    // ── Init ──────────────────────────────────────────────────────────────────
+    selectDuration('365');  // ← safe: called AFTER all var declarations
+    fetchStatus();
+  </script>
+</body>
+
+</html>
