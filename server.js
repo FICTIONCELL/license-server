@@ -11,8 +11,9 @@ const port = process.env.PORT || 4000;
 app.use(cors());
 app.use(bodyParser.json());
 
-// Database Setup
-const db = new Database(path.join(__dirname, 'licenses.db'));
+// Database Setup - Support persistent disk on Render
+const dbPath = process.env.DATABASE_PATH || path.join(__dirname, 'licenses.db');
+const db = new Database(dbPath);
 db.exec(`
   CREATE TABLE IF NOT EXISTS licenses (
     key TEXT PRIMARY KEY,
